@@ -9,7 +9,7 @@
 ;; Keywords: files, frames, help, matching, outlines, processes, tools, convenience, anything
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 ;; Site: http://www.emacswiki.org/cgi-bin/emacs/Anything
-;; Package-Version: 1.241
+;; Package-Version: 1.241.1
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -1658,19 +1658,24 @@ See `anything-iswitchb-setup-keys'.")
 (defgroup anything nil
   "Open anything." :prefix "anything-" :group 'convenience)
 
+;;;###autoload
 (defface anything-header
   '((t (:inherit header-line)))
   "Face for header lines in the anything buffer." :group 'anything)
 
+;;;###autoload
 (defvar anything-header-face 'anything-header
   "Face for header lines in the anything buffer.")
 
+;;;###autoload
 (defface anything-isearch-match '((t (:background "Yellow")))
   "Face for isearch in the anything buffer." :group 'anything)
 
+;;;###autoload
 (defvar anything-isearch-match-face 'anything-isearch-match
   "Face for matches during incremental search.")
 
+;;;###autoload
 (defvar anything-selection-face 'highlight
   "Face for currently selected item.")
 
@@ -1954,6 +1959,7 @@ If NO-UPDATE is non-nil, skip executing `anything-update'."
   (unless no-init (anything-funcall-foreach 'init))
   (unless no-update (anything-update)))
 
+;;;###autoload
 (defvar anything-compile-source-functions
   '(anything-compile-source--type anything-compile-source--dummy anything-compile-source--candidates-in-buffer)
   "Functions to compile elements of `anything-sources' (plug-in).")
