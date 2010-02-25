@@ -1,5 +1,5 @@
 ;;; anything.el --- open anything / QuickSilver-like candidate-selection framework
-;; $Id: anything.el,v 1.241 2010/01/29 18:53:17 rubikitch Exp $
+;; $Id: anything.el,v 1.241.2 2010/01/29 18:53:17 rubikitch Exp $
 
 ;; Copyright (C) 2007        Tamas Patrovics
 ;;               2008, 2009  rubikitch <rubikitch@ruby-lang.org>
@@ -9,7 +9,7 @@
 ;; Keywords: files, frames, help, matching, outlines, processes, tools, convenience, anything
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/download/anything.el
 ;; Site: http://www.emacswiki.org/cgi-bin/emacs/Anything
-;; Package-Version: 1.241.1
+;; Package-Version: 1.241.2
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -1109,7 +1109,7 @@
 ;; New maintainer.
 ;;
 
-(defvar anything-version "$Id: anything.el,v 1.241 2010/01/29 18:53:17 rubikitch Exp $")
+(defvar anything-version "$Id: anything.el,v 1.241.2 2010/01/29 18:53:17 rubikitch Exp $")
 (require 'cl)
 
 ;; (@* "User Configuration")
@@ -1875,20 +1875,22 @@ It is `anything-default-display-buffer' by default, which affects `anything-same
   (get-buffer-window anything-action-buffer 'visible))
 
 (defmacro with-anything-window (&rest body)
-  `(let ((--tmpfunc-- (lambda () ,@body)))
-     (if anything-test-mode
-         (with-current-buffer (anything-buffer-get)
-           (funcall --tmpfunc--))
-       (with-selected-window (anything-window)
-         (funcall --tmpfunc--)))))
+  (let ((tmp-func (make-symbol "tmp-func")))
+   `(let ((,tmp-func (lambda () ,@body)))
+      (if anything-test-mode
+          (with-current-buffer (anything-buffer-get)
+            (funcall ,tmp-func))
+        (with-selected-window (anything-window)
+          (funcall ,tmp-func))))))
 (put 'with-anything-window 'lisp-indent-function 0)
 
 (defmacro with-anything-restore-variables(&rest body)
   "Restore variables specified by `anything-restored-variables' after executing BODY ."
-  `(let ((--orig-vars (mapcar (lambda (v) (cons v (symbol-value v))) anything-restored-variables)))
-     (unwind-protect (progn ,@body)
-       (loop for (var . value) in --orig-vars
-             do (set var value)))))
+  (let ((orig-vars (make-symbol "orig-vars")))
+   `(let ((,orig-vars (mapcar (lambda (v) (cons v (symbol-value v))) anything-restored-variables)))
+      (unwind-protect (progn ,@body)
+        (loop for (var . value) in ,orig-vars
+              do (set var value))))))
 (put 'with-anything-restore-variables 'lisp-indent-function 0)
 
 (defun* anything-attr (attribute-name &optional (src (anything-get-current-source)))
@@ -2153,6 +2155,7 @@ This function allows easy sequencing of transformer functions."
 (defvar anything-buffers nil
   "All of `anything-buffer' in most recently used order.")
 
+;;;###autoload
 (defun anything (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
   "Select anything. In Lisp program, some optional arguments can be used.
 
@@ -2278,6 +2281,7 @@ already-bound variables. Yuck!
     (and m (set list-var (delq (car m) (symbol-value list-var))))
     (push elt (symbol-value list-var))))
 
+;;;###autoload
 (defun anything-at-point (&optional any-sources any-input any-prompt any-resume any-preselect any-buffer)
   "Same as `anything' except when C-u is pressed, the initial input is the symbol at point."
   (interactive)
